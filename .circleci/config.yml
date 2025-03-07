@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: circleci/ruby:3.2 # Ruby 3.2 の環境を使用
+      - image: cimg/ruby:3.2.3
     steps:
       - checkout
       - run:
