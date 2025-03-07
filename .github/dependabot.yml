@@ -1,4 +1,4 @@
-version: 2
+version: 3
 updates:
   # Bundler（RubyGems）の更新設定 (main 向け)
   - package-ecosystem: "bundler"
