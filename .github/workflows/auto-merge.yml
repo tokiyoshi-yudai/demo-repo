@@ -14,18 +14,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2' # 使用する Ruby のバージョンを指定
+          bundler-cache: true  # `bundle install` のキャッシュを有効化
+
       - name: Install dependencies
         run: bundle install
 
       - name: Run tests
-        run: bundle exec rspec # ここをプロジェクトのテストコマンドに変更
+        run: bundle exec rspec # RSpecを使う場合
 
   auto-merge:
-    needs: test # ★ テストが成功しないと実行されない
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
 
       - name: Enable auto-merge
         run: gh pr merge --auto --squash "$PR_URL"
