@@ -63,3 +63,5 @@ group :test do
 end
 
 gem "sidekiq"
+
+gem "rspec"
