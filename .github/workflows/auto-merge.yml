@@ -14,10 +14,16 @@ jobs:
       - name: Wait for CircleCI to pass
         run: |
           PR_URL="${{ github.event.pull_request.html_url }}"
-          while true; do
+          MAX_WAIT_TIME=$((3 * 60 * 60)) # 最大待機時間: 3時間 (180分 * 60秒)
+          WAIT_INTERVAL=30  # 30秒ごとにチェック
+          ELAPSED_TIME=0
+
+          while [[ $ELAPSED_TIME -lt $MAX_WAIT_TIME ]]; do
             CHECK_RESULT=$(gh pr checks "$PR_URL" | grep "ci/circleci: test")
-            echo "📝 CircleCI Check Output: $CHECK_RESULT"
-            STATUS=$(gh pr checks "$PR_URL" | grep "ci/circleci: test" | awk '{print $3}') # ✅ 修正: $3 を使用
+            echo "📝 CircleCI Check Output: $CHECK_RESULT" # ✅ CircleCI のチェック結果を表示
+
+            STATUS=$(echo "$CHECK_RESULT" | awk '{print $3}') # ✅ CircleCI のテスト結果 (pass / fail) を取得
+
             if [[ "$STATUS" == "pass" ]]; then
               echo "✅ CircleCI tests passed. Proceeding with auto-merge."
               exit 0
@@ -25,9 +31,14 @@ jobs:
               echo "❌ CircleCI tests failed. Stopping auto-merge."
               exit 1
             fi
-            echo "⏳ Waiting for CircleCI to complete..."
-            sleep 30
+
+            echo "⏳ Waiting for CircleCI to complete... (Elapsed: $((ELAPSED_TIME/60)) min)"
+            sleep $WAIT_INTERVAL
+            ELAPSED_TIME=$((ELAPSED_TIME + WAIT_INTERVAL))
           done
+
+          echo "⚠️ Timeout reached: CircleCI did not finish within 3 hours."
+          exit 1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
