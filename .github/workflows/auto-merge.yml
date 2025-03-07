@@ -1,4 +1,4 @@
-name: Auto Merge Dependabot PRs
+name: Auto Merge Dependabot PRs (with CircleCI Check)
 
 on:
   pull_request:
@@ -8,38 +8,33 @@ on:
       - synchronize
 
 jobs:
-  test:
+  wait-for-circleci:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'  # Ruby のバージョンを指定
-          bundler-cache: true   # `bundle install` のキャッシュを有効化
-
-      - name: Install dependencies
+      - name: Wait for CircleCI to pass
         run: |
-          gem install bundler
-          bundle install
-
-      - name: Run tests
-        run: bundle exec rspec # RSpec を使用している場合
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          while true; do
+            STATUS=$(gh pr checks "$PR_URL" | grep "ci/circleci: test" | awk '{print $2}')
+            if [[ "$STATUS" == "success" ]]; then
+              echo "✅ CircleCI tests passed. Proceeding with auto-merge."
+              exit 0
+            elif [[ "$STATUS" == "failure" ]]; then
+              echo "❌ CircleCI tests failed. Stopping auto-merge."
+              exit 1
+            fi
+            echo "⏳ Waiting for CircleCI to complete..."
+            sleep 30
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   auto-merge:
-    needs: test
+    needs: wait-for-circleci
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-          bundler-cache: true
 
       - name: Enable auto-merge
         run: gh pr merge --auto --squash "$PR_URL"
