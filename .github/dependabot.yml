@@ -1,28 +1,29 @@
 version: 2
 updates:
-  # Bundler（RubyGems）の更新設定 (stagingブランチ向け)
+  # Bundler（RubyGems）の更新設定 (staging向け)
   - package-ecosystem: "bundler"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "daily" # 毎日更新
     target-branch: "staging"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "auto-merge"
+      - "auto-merge" # ★ ここで自動マージラベルを付与
     commit-message:
       prefix: "chore(deps):"
       include: "scope"
 
-  # Bundler（RubyGems）の更新設定 (mainブランチ向け)
+  # Bundler（RubyGems）の更新設定 (main向け)
   - package-ecosystem: "bundler"
     directory: "/"
     schedule:
-      interval: "weekly" # mainブランチの更新頻度は weekly に設定
+      interval: "weekly" # 本番ブランチの更新頻度は weekly
     target-branch: "main"
     open-pull-requests-limit: 3
     labels:
       - "dependencies"
+      - "auto-merge" # ★ ここで自動マージラベルを付与
     commit-message:
       prefix: "chore(deps):"
       include: "scope"
