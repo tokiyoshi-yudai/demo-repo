@@ -64,4 +64,4 @@ end
 
 gem "sidekiq"
 
-gem "rspec"
+gem "rspec", "3.8.0"
