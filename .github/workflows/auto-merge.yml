@@ -11,18 +11,29 @@ jobs:
   wait-for-circleci:
     runs-on: ubuntu-latest
     steps:
+      - name: Log CircleCI check result
+        run: |
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          echo "🔍 Checking CircleCI status for PR: $PR_URL"
+          CHECK_RESULT=$(gh pr checks "$PR_URL" | grep "ci/circleci: test")
+          echo "📝 CircleCI Check Output: $CHECK_RESULT"
+
       - name: Wait for CircleCI to pass
         run: |
           PR_URL="${{ github.event.pull_request.html_url }}"
           while true; do
-            STATUS=$(gh pr checks "$PR_URL" | grep "ci/circleci: test" | awk '{print $2}')
-            if [[ "$STATUS" == "success" ]]; then
+            CHECK_RESULT=$(gh pr checks "$PR_URL" | grep "ci/circleci: test")
+            echo "🔍 Current CircleCI Status: $CHECK_RESULT"
+            STATUS=$(echo "$CHECK_RESULT" | awk '{print $3}')
+            
+            if [[ "$STATUS" == "pass" ]]; then
               echo "✅ CircleCI tests passed. Proceeding with auto-merge."
               exit 0
-            elif [[ "$STATUS" == "failure" ]]; then
+            elif [[ "$STATUS" == "fail" ]]; then
               echo "❌ CircleCI tests failed. Stopping auto-merge."
               exit 1
             fi
+            
             echo "⏳ Waiting for CircleCI to complete..."
             sleep 30
           done
