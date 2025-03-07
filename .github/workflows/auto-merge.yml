@@ -17,14 +17,16 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2' # 使用する Ruby のバージョンを指定
-          bundler-cache: true  # `bundle install` のキャッシュを有効化
+          ruby-version: '3.2'  # Ruby のバージョンを指定
+          bundler-cache: true   # `bundle install` のキャッシュを有効化
 
       - name: Install dependencies
-        run: bundle install
+        run: |
+          gem install bundler
+          bundle install
 
       - name: Run tests
-        run: bundle exec rspec # RSpecを使う場合
+        run: bundle exec rspec # RSpec を使用している場合
 
   auto-merge:
     needs: test
