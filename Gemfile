@@ -66,4 +66,4 @@ gem "sidekiq"
 
 gem "rspec"
 
-gem "faker", "1.9.1"
+gem "faker", "3.5.1"
