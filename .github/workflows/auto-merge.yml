@@ -13,20 +13,20 @@ permissions:
 jobs:
   wait-for-circleci:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.AUTO_MERGE_PAT }}
     steps:
       - name: Wait for CircleCI to pass
         run: |
           PR_URL="${{ github.event.pull_request.html_url }}"
-          MAX_WAIT_TIME=$((3 * 60 * 60)) # 最大待機時間: 3時間 (180分 * 60秒)
+          MAX_WAIT_TIME=$((3 * 60 * 60)) # 最大待機時間: 3時間
           WAIT_INTERVAL=30  # 30秒ごとにチェック
           ELAPSED_TIME=0
 
           while [[ $ELAPSED_TIME -lt $MAX_WAIT_TIME ]]; do
             CHECK_RESULT=$(gh pr checks "$PR_URL" | grep "ci/circleci: test")
             echo "📝 CircleCI Check Output: $CHECK_RESULT"
-
             STATUS=$(echo "$CHECK_RESULT" | awk '{print $3}')
-
             if [[ "$STATUS" == "pass" ]]; then
               echo "✅ CircleCI tests passed. Proceeding with auto-merge."
               exit 0
@@ -34,7 +34,6 @@ jobs:
               echo "❌ CircleCI tests failed. Stopping auto-merge."
               exit 1
             fi
-
             echo "⏳ Waiting for CircleCI to complete... (Elapsed: $((ELAPSED_TIME/60)) min)"
             sleep $WAIT_INTERVAL
             ELAPSED_TIME=$((ELAPSED_TIME + WAIT_INTERVAL))
@@ -42,12 +41,12 @@ jobs:
 
           echo "⚠️ Timeout reached: CircleCI did not finish within 3 hours."
           exit 1
-        env:
-          GH_TOKEN: ${{ secrets.AUTO_MERGE_PAT }}
 
   auto-merge:
     needs: wait-for-circleci
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.AUTO_MERGE_PAT }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -62,6 +61,4 @@ jobs:
         run: |
           echo "Merging PR #$PR_ID"
           gh pr merge --auto --squash "$PR_ID"
-        env:
-          GH_TOKEN: ${{ secrets.AUTO_MERGE_PAT }}
 
