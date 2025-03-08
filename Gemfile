@@ -66,4 +66,3 @@ gem "sidekiq"
 
 gem "rspec"
 
-gem "faraday"
