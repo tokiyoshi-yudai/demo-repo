@@ -65,4 +65,3 @@ end
 gem "sidekiq"
 
 gem "rspec"
-
