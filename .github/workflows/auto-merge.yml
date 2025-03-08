@@ -49,9 +49,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Extract PR ID
+        run: |
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_ID=$(basename "$PR_URL")  # PR の URL から PR 番号を取得
+          echo "PR_ID=$PR_ID" >> $GITHUB_ENV  # 環境変数に保存
+
       - name: Enable auto-merge
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: |
+          echo "Merging PR #$PR_ID"
+          gh pr merge --auto --squash "$PR_ID"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: contains(github.event.pull_request.labels.*.name, 'auto-merge')
 
