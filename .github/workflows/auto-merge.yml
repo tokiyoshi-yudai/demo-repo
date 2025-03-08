@@ -23,9 +23,9 @@ jobs:
 
           while [[ $ELAPSED_TIME -lt $MAX_WAIT_TIME ]]; do
             CHECK_RESULT=$(gh pr checks "$PR_URL" | grep "ci/circleci: test")
-            echo "📝 CircleCI Check Output: $CHECK_RESULT" # CircleCI のチェック結果を表示
+            echo "📝 CircleCI Check Output: $CHECK_RESULT"
 
-            STATUS=$(echo "$CHECK_RESULT" | awk '{print $3}') # CircleCI のテスト結果 (pass / fail) を取得
+            STATUS=$(echo "$CHECK_RESULT" | awk '{print $3}')
 
             if [[ "$STATUS" == "pass" ]]; then
               echo "✅ CircleCI tests passed. Proceeding with auto-merge."
@@ -43,7 +43,7 @@ jobs:
           echo "⚠️ Timeout reached: CircleCI did not finish within 3 hours."
           exit 1
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_PAT }}
 
   auto-merge:
     needs: wait-for-circleci
@@ -55,13 +55,13 @@ jobs:
       - name: Extract PR ID
         run: |
           PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_ID=$(basename "$PR_URL")  # PR の URL から PR 番号を取得
-          echo "PR_ID=$PR_ID" >> $GITHUB_ENV  # 環境変数に保存
+          PR_ID=$(basename "$PR_URL")
+          echo "PR_ID=$PR_ID" >> $GITHUB_ENV
 
       - name: Enable auto-merge
         run: |
           echo "Merging PR #$PR_ID"
           gh pr merge --auto --squash "$PR_ID"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_PAT }}
 
