@@ -65,5 +65,5 @@ end
 gem "rspec"
 
 gem "devise",   "4.7.3"   # 認証用 Gem の古いバージョン
-gem "bullet",   "6.1.0"   # N+1 問題などを検出するための Gem の古いバージョン
+gem "bullet",   "8.0.1"   # N+1 問題などを検出するための Gem の古いバージョン
 gem "kaminari", "1.1.1"   # ページネーション用 Gem の古いバージョン
