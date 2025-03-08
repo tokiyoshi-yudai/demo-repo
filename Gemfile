@@ -66,4 +66,4 @@ gem "sidekiq"
 
 gem "rspec"
 
-gem "faker", "1.9.1"
+gem "httparty", "0.18.1"
