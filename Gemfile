@@ -66,4 +66,4 @@ gem "sidekiq"
 
 gem "rspec"
 
-gem "httparty", "0.18.1"
+gem "httparty", "0.22.0"
