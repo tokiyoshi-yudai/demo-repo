@@ -7,8 +7,7 @@ on:
       - labeled
       - synchronize
 
-permissions:
-  pull-requests: write
+permissions: write-all
 
 jobs:
   wait-for-circleci:
