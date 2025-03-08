@@ -376,14 +376,14 @@ DEPENDENCIES
   brakeman
   capybara
   debug
-  faraday (= 0.17.0)
+  faraday
   importmap-rails
   jbuilder
   kamal
   propshaft
   puma
   rails (~> 8.0.1)
-  rspec (= 3.8.0)
+  rspec
   rubocop-rails-omakase
   selenium-webdriver
   sidekiq
